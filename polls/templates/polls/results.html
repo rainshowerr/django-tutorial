@@ -1,0 +1,10 @@
+<h1>{{question.question_text}}</h1>
+
+<ul>
+	{% for choice in question.choice_set.all %}
+	<!-- plurize는 vote/votes 형태를 동적으로 선택하는 데 사용됨 -->
+	<li>{{choice.choice_text}} -- {{choice.votes}} vote{{choice.votes|pluralize}}</li>
+	{% endfor %}
+</ul>
+
+<a href="{% url 'polls:detail' question.id %}">Vote again?</a>
