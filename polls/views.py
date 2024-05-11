@@ -4,6 +4,7 @@ from django.template import loader
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views import generic
+from django.utils import timezone
 
 from .models import Choice, Question
 
@@ -27,10 +28,12 @@ class IndexView(generic.ListView):
     # 그러므로 context_object_name을 따로 지정해서 덮어써줘야함
     context_object_name = "latest_question_list"
 
-    # 다른애들은 model=Question 이런식으로 지정해주는데 얜 함수를 만들어서 가져오네
     def get_queryset(self):
         """Return the last five published questions."""
-        return Question.objects.order_by("-pub_date")[:5]
+        # lte : less than or equal to 조건연산자
+        # __ : Django ORM에서 사용되는 특별한 구문
+        # 필드 이름과 비교 연산자를 결합하여 특정 조건을 나타냄
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
 
 # def detail(request, question_id):
 #     # 정석
@@ -49,6 +52,10 @@ class DetailView(generic.DetailView):
     template_name = "polls/detail.html"
     # ListView는 기본적으로 question 컨텍스트 변수 제공
     # 그러므로 덮어써줄 필요 x
+
+    # 아직 발행되지 않은 미래 질문이 나타나지 않도록 함
+    def get_queryset(self):
+        return Question.objects.filter(pub_date__lte=timezone.now())
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
