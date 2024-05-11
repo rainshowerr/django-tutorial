@@ -77,10 +77,38 @@ def vote(request, question_id):
     # reverse는 url을 하드코딩하지 않게 도와주는 함수
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,))) # 콤마 안찍으니까 에러나네
 
-# def results(request, question_id):
-#     question = get_object_or_404(Question, pk=question_id)
-#     return render(request, "polls/results.html", {"question":question})
+def results(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    if request.method == 'POST' and 'Reset' in request.POST:
+        for choice in question.choice_set.all():
+            choice.votes = 0
+            choice.save()
+    return render(request, "polls/results.html", {"question":question})
 
-class ResultView(generic.DetailView):
-    model = Question
-    template_name = "polls/results.html"
+def add(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    try:
+        choice_text = request.POST['choice_text']
+    # request.POST가 사전 형식이라서 KeyError처리 해워쟈함
+    except KeyError:
+        return render(
+            request,
+            "polls/add.html",
+            {
+                "question":question,
+                "error_message":"Choice cannot be empty.",
+            },
+        )
+    else:
+        if choice_text:
+            question.choice_set.create(choice_text=choice_text)
+            return HttpResponseRedirect(reverse('polls:detail', args=(question_id,)))
+        # choice가 비어있는 경우
+        return render(
+            request,
+            "polls/add.html",
+            {
+                "question":question,
+                "error_message":"Choice cannot be empty.",
+            },
+        )

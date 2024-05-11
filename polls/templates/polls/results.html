@@ -6,5 +6,10 @@
 	<li>{{choice.choice_text}} -- {{choice.votes}} vote{{choice.votes|pluralize}}</li>
 	{% endfor %}
 </ul>
-
 <a href="{% url 'polls:detail' question.id %}">Vote again?</a>
+<a href="{% url 'polls:index' %}">목록으로</a>
+<form action="{% url 'polls:results' question.id %}" method="post">
+	{% csrf_token %}
+	<!-- CSRF 공격 방지 -->
+	<input type="submit" name="Reset" value="초기화"/>
+</form>

@@ -1,0 +1,12 @@
+<form action="{% url 'polls:add' question.id %}" method="post">
+	{% csrf_token %}
+	<!-- CSRF 공격 방지 -->
+	<fieldset>
+		<legend><h1>{{question.question_text}}</h1></legend>
+		{% if error_message %}
+		<p><strong>{{error_message}}</strong></p>
+		{% endif %}
+		<input type="text" name="choice_text" />
+	</fieldset>
+	<input type="submit" value="Add" />
+</form>
