@@ -1,0 +1,4 @@
+### Django ###
+__pycache__
+venv
+db.sqlite3
